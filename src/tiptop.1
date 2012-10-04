@@ -1,0 +1,462 @@
+.TH TIPTOP 1 "August 2011" "Linux" "Linux User's Manual"
+.ds ME \fBtiptop\fR
+.ds PM \fBptiptop\fR
+.ds Me tiptop
+.ds Pm ptiptop
+
+.SH NAME
+tiptop \- display hardware performance counters for Linux tasks
+
+.SH SYNOPSIS
+\*(ME [OPTION]
+
+\*(ME [OPTION] -- command  (EXPERIMENTAL)
+
+\*(PM PATTERN [OPTIONS]
+
+.SH DESCRIPTION
+The \*(ME program provides a dynamic real-time view of the tasks
+running in the system. \*(Me is very similar to top (1), but the
+information displayed comes from hardware counters.
+
+\*(Me has two running \fImodes\fR: live-mode and batch-mode. In both
+modes, the system is periodically queried for the values of hardware
+counters, and various ratios are printed for each task. In live-mode,
+the display is regularly updated with new values at constant time
+intervals. In batch-mode, the same information is emitted to
+stdout. Batch-mode is appropriate for saving to a file or for further
+processing. No interaction is possible in batch-mode.
+
+Unless \*(Me is run by root, or the executable is setuid-root, a user
+can only monitor the tasks it owns.
+
+The results produced by \*(Me are organized in \fIscreens\fR. A screen
+consists in rows representing tasks, and columns reporting various
+values and ratios collected from hardware counters. Many screens can
+be defined. Only one screen is displayed at a time. The default screen
+(number 0) reports target independent values as defined in the file
+/usr/include/linux/event_counter.h. Other screens may rely on
+target-dependent counters.
+
+When an expression would result in a division by zero, a '-' sign is
+printed. When a counter involved in an expression could not be read,
+a '?' sign is printed.
+
+If -- appears in the command line, \*(Me treats the rest of the line
+as a command. A new process if forked, and hardware counters are
+attached just before execvp is called. This makes it possible to trace
+an application from the first instruction. This is commonly used in
+combination with sticky mode to track a command from start to
+finish. This is experimental!
+
+\*(Pm is simply a shortcut for tiptop -p.
+
+\*(Me requires Linux 2.6.31+.
+
+
+.SH COMMAND-LINE OPTIONS
+Command line options with a parameter override values specified in the
+configuration file. Toggles set the value or invert the value read in
+the configuration file (if any).
+
+.TP 4
+\-\fBb\fR
+Start \*(Me in batch-mode. Output is sent to stdout, and no
+interactive command is accepted. \*(Me will run forever, or until the
+number of iterations specified by \fB-n\fR. (toggle)
+
+.TP 4
+\-\fBc\fR
+display the command line of the task instead of its name. (toggle)
+
+.TP 4
+\-\-\fBcpu\-min\fR VALUE
+%CPU activity threshold. Below this value, a task is considered
+ idle and is not reported (unless idle-mode is on).
+
+.TP 4
+\-\fBd\fR VALUE
+Specify the delay between refreshes. VALUE can be fractional.
+
+.TP 4
+\-\fBE\fR FILENAME
+Specify file where errors are logged.
+
+.TP 4
+\-\-\fBepoch\fR
+Print the Epoch at each refresh. In batch-mode, it is printed at the
+beginning of each row. In live-mode, it is at the bottom of the
+display. (toggle)
+
+.TP 4
+\-\fBh --help\fR
+Print a brief help message and exit.
+
+.TP 4
+\-\fBH\fR
+Show threads. (toggle)
+
+.TP 4
+\-\fBi\fR
+Show idle tasks. (toggle)
+
+.TP 4
+\-\fBK --kernel\fR
+Include kernel activity in the reported values. This is only possible
+is the user is root, or the \*(Me executable is setuid root. (toggle)
+
+.TP 4
+\-\-\fBlist\-screens\fR
+List available screens and exit.
+
+.TP 4
+\-\fBn\fR VALUE
+Automatically exit after VALUE iterations.
+
+.TP 4
+\-\fBo\fR FILENAME
+Specify the filename for the output of batch mode.
+
+.TP 4
+\-\-\fBonly\-conf\fR
+Only screens defined in configuration file displayed (no default).
+
+.TP 4
+\-\fBp --pid\fR VALUE
+Filters processes according to VALUE. VALUE can be either the numeric
+value PID, or a string. In case of a string, all tasks whose names or
+command lines (depending on the display, see -c) contain VALUE are
+reported.
+
+.TP 4
+\-\fBS\fR VALUE
+Start \*(Me with screen number VALUE if VALUE is an integer. Otherwise
+looks for the first screen whose name contains VALUE.
+
+.TP 4
+\-\-\fBsticky\fR
+Start in sticky mode: tasks stay in the list after they die. In
+live-mode, they appear in a different color (when supported). In
+batch-mode, the word DEAD is appended. (toggle)
+
+.TP 4
+\-\-\fBtimestamp\fR
+Print a timestamp at the beginning of each row. The timestamp is the
+number of refreshes so far. In batch-mode, it is printed at the
+beginning of each row. In live-mode, it is at the bottom of the
+display. (toggle)
+
+.TP 4
+\-\fBu\fR USER
+Only show tasks owned by USER. USER can be either a login name, or the
+numeric value UID.
+
+.TP 4
+\-\fBU\fR
+Show the owner of each task. (toggle)
+
+.TP 4
+\-\fBv\fR
+Display build information and exit.
+
+.TP 4
+\-\-\fBversion\fR
+Display version information and disclaimer and exit.
+
+.TP 4
+\-\fBw\fR VALUE
+Watch the task specified by VALUE. VALUE can be either the numeric
+value PID, or a string. In case of a string, all tasks whose names or
+command lines (depending on the display, see -c) contain VALUE are
+reported. In live-mode, watched tasks are shown in a different color
+(when supported). In batch-mode, an ASCII arrow points to the watched
+tasks.
+
+.TP 4
+\-\fBW\fR PATH
+Directory where the configuration file is located.
+
+.SH INTERACTIVE COMMANDS
+In live-mode, \*(Me accepts single-key commands.
+
+.TP 4
+\fBLEFT\fR, \fBRIGHT\fR
+Rotate through available screens.
+
+.TP 4
+\fB<\fR, \fB>\fR
+Change the reference column for sorting to the left or to the right.
+
+.TP 4
+\fBc\fR
+Toggle between showing task names and command lines.
+
+.TP 4
+\fBd\fR
+Change the refresh interval. The new value is queried. Positive,
+non-zero fractional values are accepted.
+
+.TP 4
+\fBe\fR
+Display the errors encoutered so far. Scroll with UP, DOWN, PAGE_UP,
+PAGE_DOWN, HOME and END.
+
+.TP 4
+\fBh\fR
+Display a brief description of the screen and each column.
+
+.TP 4
+\fBH\fR
+Toggle between showing individual threads and accumulating values per
+process.
+
+.TP 4
+\fBi\fR
+Toggle between showing only active tasks and showing also idle tasks.
+
+.TP 4
+\fBK\fR
+Toggle between showing kernel activity and only user activity. Kernel
+mode is only available to root. Switching to and from kernel mode
+resets all counters.
+
+.TP 4
+\fBk\fR
+Kill a process. The user is asked for the PID, and the signal to send.
+
+.TP 4
+\fBp\fR
+Filter tasks by name or PID. The user is asked for a PID or string. In
+case a string is entered, only the tasks whose name or command line
+contain the string are displayed. Changing the filter resets all
+counters.
+
+.TP 4
+\fBq\fR
+Quit.
+
+.TP 4
+\fBR\fR
+Change sorting order: ascending or descending.
+
+.TP 4
+\fBS\fR
+Toggle sticky mode.
+
+.TP 4
+\fBs\fR
+Same as d.
+
+.TP 4
+\fBu\fR
+Filter tasks by user. The user name or PID is queried. Note that,
+unless \*(Me is run by root or setuid root, tasks owned by somebody
+else cannot be monitored. Changing the filter resets all counters.
+
+.TP 4
+\fBU\fR
+Toggle displaying each task's owner.
+
+.TP 4
+\fBw\fR
+Used to track a particular task. The user is asked for a PID or
+string. In case a string is entered, all tasks whose name or command
+line contain the string are highlighted.
+
+.TP 4
+\fBW\fR
+Writes a configuration file for the current state in the current
+directory.
+
+
+.SH FILES
+During startup, \*(ME attemps to read a configuration file. The file
+must be named \fB.tiptoprc\fR. This file is first searched in the
+current directory, then in the directory defined by the environment
+variable \fBTIPTOP\fR if it exists, finally in the user's home.
+
+.SS Syntax
+The file is structured in XML. The syntax is as follows.
+
+.IP "Root of tree"
+The root of the xml tree is tiptop.
+<tiptop> ... </tiptop>
+
+.IP "Options"
+Options can be specified on an <options> block.
+
+<options>
+  <option name="option1" value="value_option1"/>
+  <option name="option2" value="value_option2"/>
+       ...
+</options>
+
+Recognized options listed below, with their corresponding command line
+option.
+
+batch (-b), cpu_threshold (--cpu-min), debug (-g), delay (-d), idle
+(-i), max_iter (-n), show_cmdline (-c), show_epoch (--epoch),
+show_kernel (-K), show_timestamp (--timestamp), show_threads (-H),
+show_user (-U), watch_name (-w), sticky (--sticky), watch_uid (-w)
+
+.IP "Screens"
+Screens are defined inside a <screen> block. A screen is made of
+counters and columns. A screen has a name and an optional description.
+
+<screen name="my_screen" desc="what this screen is about">
+...
+</screen>
+
+Counters must provide an alias (used for further reference) and a
+configuration. The configuration is either a predefined value, or the
+actual value that must be provided to the perf_even_open system call
+(typically found in vendor architecture manuals).
+
+Predefined values are: CPU_CYCLES, INSTRUCTIONS, CACHE_REFERENCES,
+CACHE_MISSES, BRANCH_INSTRUCTIONS, BRANCH_MISSES, and BUS_CYCLES.
+
+.nf
+<counter alias="instr" config="INSTRUCTIONS" />
+.fi
+
+For non-predefined configs, a type must be provided. Currently, only
+RAW and HW_CACHE are supported.
+
+Optionally, a counter may be restricted to a specific architecture
+(such as "x86"), and a model. The definition of the model is
+architecture-dependent. For x86, it is defined as
+DisplayFamily_DisplayModel as computed by the instruction CPUID.  A
+counter for issued micro-ops on Sandy Bridge may look like the
+following:
+
+.nf
+<counter alias="uops_issued" config="0x010e"
+         type="RAW" arch="x86" model="06_2A" />
+.fi
+
+For the x86 architecture, a single counter can be valid for several
+models.
+
+.nf
+<counter alias="uOP" config="0x1c2" type="RAW"
+         arch="x86" model="06_1A;06_1E;06_1F;06_2E" />
+.fi
+
+When the type is HW_CACHE, the config is specified by shifting and
+ORing predefined values. The 8 least significant bits represent the
+cache level (possible values L1D, L1I, LL, DTLB, ITLB, BPU). The next
+8 bits represent the type of access (OP_READ, OP_WRITE,
+OP_PREFETCH). The last 8 bits represent are one of RESULT_ACCESS or
+RESULT_MISS.
+
+Note that "shift left" is expressed as shl (the usual << does not fit
+well in xml).
+
+.nf
+<counter alias="L1Rmiss" type="HW_CACHE"
+         config="L1D | (OP_READ shl 8) | (RESULT_MISS shl 16)" />
+.fi
+
+See also /usr/include/linux/perf_events.h for more on config and type.
+
+A column defines its header, the printf-like format for values, and an
+expression. Expressions evaluate as double precision. A description is
+optional.
+
+.nf
+<counter alias="instr" config="INSTRUCTIONS" />
+<counter alias="cycle" config="CPU_CYCLES" />
+<column header=" IPC" format="%4.2f"
+        desc="Total instructions per cycle"
+        expr="instr/cycle"/>
+<column header=" ipc" format="%4.2f"
+        desc="Total instructions per cycle"
+        expr="instr/cycle" />
+.fi
+
+The syntax of expressions supports basic arithmetic (+ - * /
+parentheses and constants). The special notation "delta(counter)"
+evaluates as the variation of the counter between refreshes.
+Expressions can also refer to predefined variables such as CPU_TOT
+(CPU usage), CPU_SYS (system CPU usage), CPU_USER (user CPU usage),
+PROC_ID (processor where the process was last seen).
+
+.nf
+<column header=" ipc" format="%4.2f"
+      desc="Average IPC over last period"
+      expr="delta(instr) / delta(cycle)" />
+.fi
+
+
+.IP "Sample config file"
+
+.nf
+<tiptop>
+
+  <options>
+    <option name="delay" value="2.0" />
+    <option name="stick" value="1" />
+  </options>
+
+  <screen name="example" desc="Sample config file">
+    <counter alias="cycle" config="CPU_CYCLES"  />
+    <counter alias="instr" config="INSTRUCTIONS" />
+    <counter alias="miss" config="CACHE_MISSES" />
+    <counter alias="br_miss" config="BRANCH_MISSES" />
+
+    <!-- Sandy Bridge only -->
+    <counter alias="uops_issued" config="0x010e"
+             type="RAW" arch="x86" model="06_2A" />
+
+    <column header=" %CPU" format="%5.1f"
+            desc="CPU usage" expr="CPU_TOT" />
+    <column header="   P" format="  %2.0f"
+            desc="Processor where last seen" expr="PROC_ID" />
+    <column header="  Mcycle" format="%8.2f"
+            desc="Cycles (millions)"
+            expr="delta(cycle) / 1e6" />
+    <column header="  Minstr" format="%8.2f"
+            desc="Instructions (millions)"
+            expr="delta(instr) / 1e6" />
+    <column header=" IPC" format="%4.2f"
+            desc="Executed instructions per cycle"
+            expr="delta(instr) / delta(cycle)" />
+    <column header=" %MISS" format="%6.2f"
+            desc="Cache miss per instructions (in %)"
+            expr="100 * delta(miss) / delta(instr)" />
+    <column header=" %BMIS" format="%6.2f"
+            desc="Branch misprediction per instruction (in %)"
+            expr="100 * delta(br_miss) / delta(instr)" />
+    <column header="uops/inst" format="     %4.1f"
+            desc="Number of issued uops per instruction"
+            expr="delta(uops_issued) / delta(instr)" />
+  </screen>
+</tiptop>
+.fi
+
+
+.SH CAVEATS
+\*(Me does not seem to work within a virtualized environment.
+
+Attaching counters to processes may fail for various reasons, such as
+asking for more than available in hardware (sampling is not
+implemented), or reaching the maximum number of open files. In these
+cases, you may consider filtering the processes (see flags -u, -p,
+-K).
+
+
+.SH BUGS
+Send bug reports to:
+   Erven Rohou <erven.rohou@inria.fr>
+
+
+.SH AUTHOR
+Written by Erven Rohou.
+
+.SH SEE ALSO
+.BR top (1),
+.BR ps (1)
+.nf
+/usr/include/linux/perf_counter.h (Linux 2.6.31)
+/usr/include/linux/event_counter.h (Linux 2.6.32+)
+.fi

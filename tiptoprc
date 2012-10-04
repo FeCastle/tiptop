@@ -1,0 +1,225 @@
+<!-- tiptop example configuration file -->
+
+<!-- Rename this file to .tiptoprc,                                       -->
+<!-- and place it either in your current directory, the location          -->
+<!-- specified in $TIPTOP, or in your $HOME.                              -->
+<!--                                                                      -->
+<!-- Note that some of the screens are redundant with builtin screen.     -->
+<!-- They are provided here for convenience and illustration.             -->
+
+<tiptop>
+
+  <options>
+    <option name="cpu_threshold" value="0.00001" />
+    <option name="delay" value="2.0" />
+    <option name="only_pid" value="0" />
+    <option name="batch" value="0" />
+  </options>
+
+  <!--
+      Simple screen, similar to the default screen.
+      Shows basic features of the config file.
+  -->
+  <screen name="default" desc="Screen by default (config file)">
+    <counter alias="CYCLE" config="CPU_CYCLES"    type="HARDWARE" />
+    <counter alias="INSN"  config="INSTRUCTIONS"  type="HARDWARE" />
+    <counter alias="MISS"  config="CACHE_MISSES"  type="HARDWARE" />
+    <counter alias="BR"    config="BRANCH_MISSES" type="HARDWARE" />
+
+    <column header=" %CPU" format="%5.1f" desc="CPU usage" expr="CPU_TOT" />
+    <column header=" %SYS" format="%5.1f" desc="system CPU usage" expr="CPU_SYS" />
+    <column header="   P" format="  %2.0f" desc="Processor where last seen"
+            expr="PROC_ID" />
+    <column header="  Mcycle" format="%8.1f" desc="Cycles (millions)"
+            expr="delta(CYCLE) / 1000000" />
+    <column header="  Minstr" format="%8.1f" desc="Instructions (millions)"
+            expr="delta(INSN) / 1000000" />
+    <column header="    IPC" format=" %6.2f"
+            desc="Executed instructions per cycle"
+            expr="delta(INSN) / delta(CYCLE)" />
+    <column header=" %MISS" format="%6.1f"
+            desc="Cache misses per 1000 instructions"
+            expr="1000 * (delta(MISS) / delta(INSN))" />
+    <column header=" %BMIS" format="%6.1f"
+            desc="Branch misprediction per 1000 instructions"
+            expr="1000 * (delta(BR) / delta(INSN))" />
+  </screen>
+
+
+  <!--
+      Another simple screen. Shows actual counter values, instead of
+      difference between refreshes. Note the lack of delta() in the
+      expression.
+  -->
+  <screen name="branch" desc="Absolute values">
+    <counter alias="CYCLE" config="CPU_CYCLES"    type="HARDWARE" />
+    <counter alias="INSN"  config="INSTRUCTIONS"  type="HARDWARE" />
+
+    <column header="  %CPU" format=" %5.1f" desc="CPU usage" expr="CPU_TOT" />
+    <column header="  Gcycle" format="%8.2f" desc="Cycles (billions)"
+            expr="CYCLE / 1000000000" />
+    <column header="  Ginstr" format="%8.2f" desc="Instructions (billions)"
+            expr="INSN / 1000000000" />
+    <column header="  Ginstr" format="%8.2f" desc="Instructions (billions)"
+            expr="INSN / 1000000000" />
+    <column header="  IPC" format=" %4.2f"
+            desc="Total executed instructions per cycle"
+            expr="INSN / CYCLE" />
+  </screen>
+
+
+  <!--
+      Target independent screen.
+      Displays behavior of L1 cache.
+  -->
+  <screen name="L1" desc="Statistics on L1 cache">
+    <counter alias="CYCLE" config="CPU_CYCLES"   type="HARDWARE" />
+    <counter alias="INSN"  config="INSTRUCTIONS" type="HARDWARE" />
+    <counter alias="L1read" type="HW_CACHE"
+             config="L1D | (OP_READ shl 8) | (RESULT_ACCESS shl 16)" />
+    <counter alias="L1write" type="HW_CACHE"
+             config="L1D | (OP_WRITE shl 8) | (RESULT_ACCESS shl 16)" />
+    <counter alias="L1Rmiss" type="HW_CACHE"
+             config="L1D | (OP_READ shl 8) | (RESULT_MISS shl 16)" />
+    <counter alias="L1Wmiss" type="HW_CACHE"
+             config="L1D | (OP_WRITE shl 8) | (RESULT_MISS shl 16)" />
+
+    <column header="  IPC" format=" %4.1f" desc="Executed instructions per cycle"
+            expr="delta(INSN)/delta(CYCLE)"/>
+
+    <column header=" L1Dread" format=" %7.1f" desc="L1D reads (thousands)"
+            expr="delta(L1read)/1000" />
+
+    <column header="  R miss" format=" %7.1f" desc="L1D read misses (thousands)"
+            expr="delta(L1Rmiss)/1000" />
+
+    <column header=" L1Dwrite" format="  %7.1f" desc="L1D writes (thousands)"
+            expr="delta(L1write)/1000" />
+
+    <column header="  W miss" format=" %7.1f" desc="L1D write misses (thousands)"
+            expr="delta(L1Wmiss)/1000" />
+  </screen>
+
+
+  <!--
+      This screen uses target specific counters, only available on x86
+      platforms, and CPUID signature 06_1A, 06_1E, 06_1F and
+      06_2E. Only micro operations for CPUID 06_2A.
+  -->
+  <screen name="uOps" desc="micro operations">
+    <counter alias="C" config="CPU_CYCLES"   type="HARDWARE" />
+    <counter alias="I" config="INSTRUCTIONS" type="HARDWARE" />
+
+    <!-- number of micro-ops retired -->
+    <counter alias="uOP" config="0x1c2" type="RAW"
+             arch="x86" model="06_1A;06_1E;06_1F;06_2E" />
+    <counter alias="uOP" config="0x1c2" type="RAW" arch="x86" model="06_2A" />
+
+    <!-- number of macro-fused uops retired -->
+    <counter alias="MACRO" config="0x4c2" type="RAW"
+             arch="x86" model="06_1A;06_1E;06_1F;06_2E" />
+
+    <column header=" %CPU" format="%5.1f" desc="CPU usage" expr="CPU_TOT" />
+    <column header=" %SYS" format="%5.1f" desc="system CPU usage" expr="CPU_SYS" />
+    <column header="  Mcycle" format="%8.1f" desc="Cycles (millions)"
+            expr="delta(C) / 1000000" />
+    <column header="  Minstr" format="%8.1f" desc="Instructions (millions)"
+            expr="delta(I) / 1000000" />
+    <column header="  IPC" format=" %4.2f" desc="Executed instructions per cycle"
+            expr="delta(I) / delta(C)" />
+    <column header="   Muops" format="%8.2f" desc="Retired uops (millions)"
+            expr="delta(uOP) / 1000000" />
+    <column header="  uPI" format=" %4.2f" desc="Retired uops per instruction"
+            expr="delta(uOP) / delta(I)" />
+    <column header=" macrof" format="   %4.2f"
+            desc="Macro fused uops per instruction"
+            expr="delta(MACRO) / delta(I)" />
+  </screen>
+
+
+  <!--
+      Target specific screen, for x86 platforms, and CPUID signature
+      06_1A, 06_1E, 06_1F and 06_2E.
+      Measures floating point properties.
+  -->
+  <screen name="FP" desc="Floating point instructions">
+    <counter alias="C" config="CPU_CYCLES" type="HARDWARE" />
+    <counter alias="I" config="INSTRUCTIONS" type="HARDWARE" />
+
+    <counter alias="x87" config="0x0110" type="RAW"
+             arch="x86" model="06_1A;06_1E;06_1F;06_2E" />
+    <counter alias="x87" config="0x0110" type="RAW"
+             arch="x86" model="06_2A" />
+    <counter alias="sp"  config="0x4010" type="RAW"
+             arch="x86" model="06_1A;06_1E;06_1F;06_2E" />
+    <counter alias="dp"  config="0x8010" type="RAW"
+             arch="x86" model="06_1A;06_1E;06_1F;06_2E" />
+    <counter alias="assist" config="0x1f7" type="RAW"
+             arch="x86" model="06_1A;06_1E;06_1F;06_2E"/>
+    <counter alias="assist" config="0x1eca" type="RAW"
+             arch="x86" model="06_2A"/>
+
+    <column header=" %CPU" format="%5.1f" desc="CPU usage" expr="CPU_TOT" />
+    <column header="  Mcycle" format="%8.1f" desc="Cycles (millions)"
+            expr="delta(C) / 1000000" />
+    <column header="  Minstr" format="%8.1f" desc="Instructions (millions)"
+            expr="delta(I) / 1000000" />
+    <column header="  IPC" format=" %4.2f" desc="Executed instructions per cycle"
+            expr="delta(I) / delta(C)" />
+    <column header=" %x87" format="%5.1f"
+            desc="FP computational uops per insn (%)"
+            expr="100 * delta(x87) / delta(I)" />
+    <column header="      %SSES" format="   %8.1f"
+            desc="SSE* FP single precision uops per insn (%)"
+            expr="100 * (delta(sp) / delta(I))" />
+    <column header="      %SSED" format="   %8.1f"
+            desc="SSE* FP double precision uops per insn (%)"
+            expr="100 * delta(dp) / delta(I)" />
+    <column header="%assist" format="  %5.1f"
+            desc="FP op that required micro-code assist per instruction (%)"
+            expr="100 * delta(assist) / delta(I)" />
+  </screen>
+
+
+  <!--
+      Target specific screen, for x86 platforms, and CPUID signature
+      06_1A, 06_1E, 06_1F, 06_2E, and 06_2A.
+      Displays (partial) instruction mix.
+  -->
+  <screen name="imix" desc="Instruction mix">
+    <counter alias="C"   config="CPU_CYCLES" type="HARDWARE" />
+    <counter alias="I"   config="INSTRUCTIONS" type="HARDWARE" />
+
+    <counter alias="LD"  config="0x10b" type="RAW"
+             arch="x86" model="06_1A;06_1E;06_1F;06_2E" />
+    <counter alias="LD"  config="0x81d0" type="RAW" arch="x86" model="06_2A" />
+    <counter alias="ST"  config="0x20b" type="RAW"
+             arch="x86" model="06_1A;06_1E;06_1F;06_2E" />
+    <counter alias="ST"  config="0x82d0" type="RAW" arch="x86" model="06_2A" />
+    <counter alias="x87" config="0x2c0" type="RAW"
+             arch="x86" model="06_1A;06_1E;06_1F;06_2E" />
+    <counter alias="x87" config="0x0110" type="RAW" arch="x86" model="06_2A" />
+
+    <counter alias="brr" config="0xc4"  type="RAW"
+             arch="x86" model="06_1A;06_1E;06_1F;06_2E" />
+    <counter alias="brr" config="0xc4"  type="RAW" arch="x86" model="06_2A" />
+
+    <column header=" %CPU" format="%5.1f" desc="CPU usage" expr="CPU_TOT" />
+    <column header="  Mcycle" format="%8.1f" desc="Cycles (millions)"
+            expr="delta(C) / 1000000" />
+    <column header="  Minstr" format="%8.1f" desc="Instructions (millions)"
+            expr="delta(I) / 1000000" />
+    <column header="  IPC" format=" %4.2f" desc="Executed instructions per cycle"
+            expr="delta(I) / delta(C)" />
+    <column header="       %LD" format="  %8.1f" desc="Fraction of load (%)"
+            expr="100 * delta(LD) / delta(I)" />
+    <column header="      %ST" format="  %7.1f" desc="Fraction of stores (%)"
+            expr="100 * (delta(ST) / delta(I))" />
+    <column header="   %FP" format="  %4.1f" desc="Fraction of x87 (%)"
+            expr="100 * (delta(x87) / delta(I))" />
+    <column header="       %BR" format="  %8.1f"
+            desc="Fraction of branch instructions (%)"
+            expr="100 * (delta(brr) / delta(I))" />
+  </screen>
+
+</tiptop>

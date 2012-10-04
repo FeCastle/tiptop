@@ -1,0 +1,26 @@
+Tiptop can be built in two ways:
+- in-directory, mixing object files with source code;
+- in another directory.
+
+
+* In-directory
+
+1. cd /where/you/unpacked/tiptop-x.y
+2.  ./configure [--prefix=/some/where]
+3.  make
+(4. optional)  make install
+
+
+
+* In another directory
+
+1.  mkdir build-dir
+2.  cd build-dir
+3.  /where/you/unpacked/tiptop-x.y/configure  [--prefix=/some/where]
+4.  make
+(5. optional)  make install
+
+
+
+Consider editing and installing the provided configuration file
+tiptoprc.

@@ -1,0 +1,42 @@
+
+                             Tiptop
+
+
+Tiptop is a performance monitoring tool for Linux.  It provides a
+dynamic real-time view of the tasks running in the system. tiptop is
+very similar to the top utility, but most of the information displayed
+comes from hardware counters.
+
+
+* Installation
+Tiptop is a single executable. It can be launched from any place in
+the filesystem. Documentation is in the man page tiptop.1.
+For installation instructions, check file INSTALL.
+
+
+* Requirements
+Linux 2.6.31+, /proc filesystem. For live-mode, the ncurses library is
+needed. libxml2 is required to parse the configuration file.
+
+
+* Common command lines:
+
+tiptop --help
+
+tiptop
+  no arg, uses default
+
+tiptop -b
+  batch mode
+
+tiptop -d 10
+  refresh every 10 seconds
+
+tiptop -i
+  also show idle processes (see --cpu-min to define the threshold)
+
+tiptop -H
+  also show threads
+
+tiptop -W path
+  specify the location of the configuration file
