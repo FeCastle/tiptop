@@ -1,0 +1,15 @@
+# Created by configure
+/config.*
+/Makefile
+/src/Makefile
+
+# Flex and Bison products
+/src/lex.yy.c
+/src/y.tab.[ch]
+
+# Object files
+*.o
+
+# Build products
+/src/ptiptop
+/src/tiptop
