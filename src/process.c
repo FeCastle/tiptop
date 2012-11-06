@@ -18,6 +18,8 @@
 #include <string.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <sys/time.h>
+#include <sys/resource.h>
 
 #include "error.h"
 #include "hash.h"
@@ -60,9 +62,21 @@ struct process_list* init_proc_list()
   if (f) {
     while (fgets(line, 100, f)) {
       int n;
-      n = sscanf(line, "Max open files %d", &num_files_limit);
-      if (n)
+      int soft_files_limit, hard_files_limit;
+      /* Use hard limit, not soft, for "Max open files" */
+      n = sscanf(line, "Max open files %d %d", &soft_files_limit, &hard_files_limit);
+      if (n) {
+        if (soft_files_limit < hard_files_limit) {
+          struct rlimit r1;
+          r1.rlim_cur = hard_files_limit;
+          r1.rlim_max = hard_files_limit;
+          /* Must bump our soft limit to the maximum. */
+          setrlimit( RLIMIT_NOFILE, &r1 );
+          printf("Setting RLIMIT_NOFILE to %d\n",hard_files_limit);
+        }
+        num_files_limit = hard_files_limit;
         break;
+      }
     }
     fclose(f);
   }
