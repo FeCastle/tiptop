@@ -14,18 +14,15 @@ class test_tiptop_fd (unittest.TestCase):
     def setUp(self):        
         self.seq = range(10)
 
-    def test_shuffle(self):
-        # make sure the shuffled sequence does not lose any elements
-        random.shuffle(self.seq)
-        self.seq.sort()
-        self.assertEqual(self.seq, range(10))
-
-        # should raise an exception for an immutable sequence
-        self.assertRaises(TypeError, random.shuffle, (1,2,3))
-
-    def test_choice(self):
-        element = random.choice(self.seq)
-        self.assertTrue(element in self.seq)
+    def test_compare(self, map1, map2):
+        objectlist = sorted(map1.keys())        
+        for item in objectlist:
+            self.assertEqual (map1[item], map2[item])
+        
+    def test_findquestionmark(self, map2):
+        objectlist = sorted(map2.keys())        
+        for item in objectlist:
+            self.assertNotIn('?', map2[item], "Found no ?")
 
     def test_sample(self):
         with self.assertRaises(ValueError):
