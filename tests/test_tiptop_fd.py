@@ -15,20 +15,23 @@ class test_tiptop_fd (unittest.TestCase):
         except IOError:
             print "Could not find tiptop data file tiptop_test.obj" 
 
+    def test_found(self):       
+        self.assertIsNotNone(self.map1, "Found no entry for objects")            
+    
     def test_compare(self):
         objectlist = sorted(self.map1.keys())        
         for item in objectlist:
             if self.map1[item] == '?':
-                self.assertEqual (self.map1[item], self.map2[item], "Not equal")
+                self.assertNotEqual(self.map1[item], self.map2[item], "Found ? for both tiptop")
         
     def test_findquestionmark(self):
         objectlist = sorted(self.map2.keys())        
         for item in objectlist:
             self.assertNotIn('?', self.map2[item], "Found ? for %s" % item)
-            #print self.map2[item]
 
     def suite(self):
         suite = unittest.TestSuite()
+        suite.addTest(test_tiptop_fd('test_found'))
         suite.addTest(test_tiptop_fd('test_compare'))
         suite.addTest(test_tiptop_fd('test_findquestionmark'))
         return suite
