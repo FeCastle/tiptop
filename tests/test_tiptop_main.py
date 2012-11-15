@@ -13,7 +13,6 @@ import time
 
 def main():   
     processlist = []
-    outputlist = []
     objectlist = []
     objectoldmap = {}
     objectnewmap = {}
@@ -31,16 +30,15 @@ def main():
         new_tiptop = "../src/tiptop"
    
     #build tiptop command
-    base_oldcmd = old_tiptop + " -b -c -n " + str(n) + " -o "
-    base_newcmd = new_tiptop + " -b -c -n " + str(n) + " -o "    
+    base_oldcmd = old_tiptop + " -b -c -n " + str(n) + " -o tiptop.old"
+    base_newcmd = new_tiptop + " -b -c -n " + str(n) + " -o tiptop.new"    
     
     #read testobjects.txt and build list of commands
     try:
         test_objects = open ("testobjects.txt")
         for line in test_objects:
             processlist.append(line.strip('\n') + " & ")
-            objectlist.append(line.strip('\n'))
-            outputlist.append(line.strip('\n') + ".output")       
+            objectlist.append(line.strip('\n'))      
         test_objects.close()
     except IOError:
         print "Missing testobjects.txt"
@@ -53,9 +51,8 @@ def main():
      
     #use tiptop to evaluate info
     if len (argv) > 1 and argv[1] != 'passive':
-        #for output in outputlist:
-        subprocess.Popen(base_oldcmd + "tiptop.old", stdout=subprocess.PIPE, shell=True)
-        subprocess.Popen(base_newcmd + "tiptop.new", stdout=subprocess.PIPE, shell=True)
+        subprocess.Popen(base_oldcmd, stdout=subprocess.PIPE, shell=True)
+        subprocess.Popen(base_newcmd, stdout=subprocess.PIPE, shell=True)
     
         time.sleep(n)         #wait to finish
                 
