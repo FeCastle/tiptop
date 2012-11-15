@@ -41,7 +41,7 @@ def main():
         print "Missing testobjects.txt"
     
     #Run commands in background like firefox, google-chrome, skip if invoked with 'pass'
-    if argv[1] != 'pass':
+    if argv[1] != 'pass' and argv[1] != 'passive':
         for cmd in processlist:
             subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
  
