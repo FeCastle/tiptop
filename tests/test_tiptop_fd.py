@@ -18,11 +18,21 @@ class test_tiptop_fd (unittest.TestCase):
     def test_found(self):       
         self.assertIsNotNone(self.map1, "Found no entry for objects")            
     
-    def test_compare(self):
+    def test_comparequestionmark(self):
         objectlist = sorted(self.map1.keys())        
         for item in objectlist:
-            if self.map1[item] == '?':
-                self.assertNotEqual(self.map1[item], self.map2[item], "Found ? for both tiptop")
+            match = '?'
+            if match in self.map1[item]:
+                idx = self.map1[item].index(match)
+                self.assertNotEqual('?', self.map2[item][idx], "Found ? for both tiptop")
+    
+    def test_comparedash(self):
+        objectlist = sorted(self.map1.keys())        
+        for item in objectlist:
+            match = '-'
+            if match in self.map1[item]:
+                idx = self.map1[item].index(match)
+                self.assertNotEqual('-', self.map2[item][idx], "Found - for both tiptop")
         
     def test_findquestionmark(self):
         objectlist = sorted(self.map2.keys())        
@@ -32,7 +42,8 @@ class test_tiptop_fd (unittest.TestCase):
     def suite(self):
         suite = unittest.TestSuite()
         suite.addTest(test_tiptop_fd('test_found'))
-        suite.addTest(test_tiptop_fd('test_compare'))
+        suite.addTest(test_tiptop_fd('test_comparequestionmark'))
+        suite.addTest(test_tiptop_fd('test_comparedash'))
         suite.addTest(test_tiptop_fd('test_findquestionmark'))
         return suite
 
