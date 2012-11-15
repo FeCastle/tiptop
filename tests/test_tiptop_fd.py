@@ -21,18 +21,22 @@ class test_tiptop_fd (unittest.TestCase):
     def test_comparequestionmark(self):
         objectlist = sorted(self.map1.keys())        
         for item in objectlist:
-            match = '?'
-            if match in self.map1[item]:
-                idx = self.map1[item].index(match)
-                self.assertNotEqual('?', self.map2[item][idx], "Found ? for both tiptop")
+            i = 0
+            while i < len(self.map1[item]):
+                if self.map1[item][i] == '?':
+                    self.assertNotEqual('?', self.map2[item][i], "Found ? for both tiptop")
+                    print "for %s, %s becomes %s" % (item, self.map1[item][i], self.map2[item][i])
+                i = i + 1
     
     def test_comparedash(self):
         objectlist = sorted(self.map1.keys())        
         for item in objectlist:
-            match = '-'
-            if match in self.map1[item]:
-                idx = self.map1[item].index(match)
-                self.assertNotEqual('-', self.map2[item][idx], "Found - for both tiptop")
+            i = 0
+            while i < len(self.map1[item]):
+                if self.map1[item][i] == '-':
+                    self.assertNotEqual('-', self.map2[item][i], "Found - for both tiptop")
+                    print "for %s, %s becomes %s" % (item, self.map1[item][i], self.map2[item][i])
+                i = i + 1
         
     def test_findquestionmark(self):
         objectlist = sorted(self.map2.keys())        
