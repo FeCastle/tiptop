@@ -42,19 +42,20 @@ def main():
         print "Missing testobjects.txt"
     
     #Run commands in background like firefox, google-chrome, skip if invoked with 'pass'
-    if argv[1] != '' and argv[1] != 'pass' and argv[1] != 'passive':
-        for cmd in processlist:
-            subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
- 
-    time.sleep(2)         #wait to finish
+    if argv[1] != '': 
+        if argv[1] != 'pass' and argv[1] != 'passive':
+            for cmd in processlist:
+                subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+            time.sleep(2)         #wait to finish
      
     #use tiptop to evaluate info
-    if argv[1] != '' and argv[1] != 'passive':
-        #for output in outputlist:
-        subprocess.Popen(base_oldcmd + "tiptop.old", stdout=subprocess.PIPE, shell=True)
-        subprocess.Popen(base_newcmd + "tiptop.new", stdout=subprocess.PIPE, shell=True)
+    if argv[1] != '': 
+        if argv[1] != 'passive':
+            #for output in outputlist:
+            subprocess.Popen(base_oldcmd + "tiptop.old", stdout=subprocess.PIPE, shell=True)
+            subprocess.Popen(base_newcmd + "tiptop.new", stdout=subprocess.PIPE, shell=True)
     
-    time.sleep(n)         #wait to finish
+            time.sleep(n)         #wait to finish
                 
     #Examine old file
     tiptop_output = open ("tiptop.old")  
