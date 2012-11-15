@@ -26,8 +26,8 @@ def main():
         new_tiptop = "../src/tiptop"
    
     #build tiptop command
-    base_oldcmd = old_tiptop + " -b -c -n " + n + " -o "
-    base_newcmd = new_tiptop + " -b -c -n " + n + " -o "    
+    base_oldcmd = old_tiptop + " -b -c -n " + str(n) + " -o "
+    base_newcmd = new_tiptop + " -b -c -n " + str(n) + " -o "    
     
     #read testobjects.txt and build list of commands
     try:
