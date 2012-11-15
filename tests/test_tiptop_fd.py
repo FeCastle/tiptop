@@ -19,12 +19,12 @@ class test_tiptop_fd (unittest.TestCase):
         objectlist = sorted(self.map1.keys())        
         for item in objectlist:
             if self.map1[item] == '?':
-                self.assertEqual (self.map1[item], self.map2[item])
+                self.assertEqual (self.map1[item], self.map2[item], "Not equal")
         
     def test_findquestionmark(self):
         objectlist = sorted(self.map2.keys())        
         for item in objectlist:
-            self.assertNotIn('?', self.map2[item], "Found no ? for %s" % item)
+            self.assertNotIn('?', self.map2[item], "Found ? for %s" % item)
             #print self.map2[item]
 
     def suite(self):
