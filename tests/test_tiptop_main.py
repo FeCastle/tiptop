@@ -1,6 +1,7 @@
 """
 Usage: python test_tiptop_main.py [pass]
 pass - Used when user already configure commands run in background.
+passive - Used when user already ran tiptop and saved in tiptop.old and tiptop.new
 Need to put list of commands in testobjects.txt before running this script
 """
 from sys import argv
@@ -16,10 +17,13 @@ def main():
     objectlist = []
     objectoldmap = {}
     objectnewmap = {}
-    n = 2
+    old_tiptop = ''
+    new_tiptop = ''
+    n = 10
     
-    old_tiptop = raw_input ("Enter path to old tiptop (eg ../src/tiptop): ")
-    new_tiptop = raw_input ("Enter path to new tiptop: ")
+    if len (argv) > 1 and argv[1] != 'passive':
+        old_tiptop = raw_input ("Enter path to old tiptop (eg ../src/tiptop): ")
+        new_tiptop = raw_input ("Enter path to new tiptop: ")
     
     if old_tiptop == '':
         old_tiptop = "../../oldtiptop/tiptop/src/tiptop"
@@ -71,6 +75,8 @@ def main():
                 objectnewmap [elem] = line.split()
     tiptop_output.close()
 
+    #print objectoldmap
+    #print objectnewmap
     #dump info to file for test suite to read
     pickle.dump((objectoldmap, objectnewmap), open( "tiptop_test.obj", "wb"))
     
