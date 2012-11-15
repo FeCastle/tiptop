@@ -53,14 +53,13 @@ def main():
     if len (argv) > 1 and argv[1] != 'passive':
         subprocess.Popen(base_oldcmd, stdout=subprocess.PIPE, shell=True)
         subprocess.Popen(base_newcmd, stdout=subprocess.PIPE, shell=True)
-    
-        time.sleep(n)         #wait to finish
+        time.sleep(2)         #wait to finish
                 
     #Examine old file
     tiptop_output = open ("tiptop.old")  
     for line in tiptop_output:
         for elem in objectlist:
-            if elem in line:
+            if (elem in line) and (elem not in objectoldmap):
                 objectoldmap [elem] = line.split()
     tiptop_output.close()
         
@@ -68,7 +67,7 @@ def main():
     tiptop_output = open ("tiptop.new")  
     for line in tiptop_output:
         for elem in objectlist:
-            if elem in line:
+            if (elem in line) and (elem not in objectnewmap):
                 objectnewmap [elem] = line.split()
     tiptop_output.close()
 
