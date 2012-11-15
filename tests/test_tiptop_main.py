@@ -1,6 +1,7 @@
 from test_tiptop_fd import test_tiptop_fd
 import unittest
 import subprocess
+import cPickle as pickle
 
 def main():   
     
@@ -51,6 +52,7 @@ def main():
                 objectnewmap [elem] = line.split()
     tiptop_output.close()
 
+    pickle.dump((objectoldmap, objectnewmap), open( "tiptop_test.obj", "wb"))
     
     suite = unittest.TestLoader().loadTestsFromTestCase(test_tiptop_fd)
     unittest.TextTestRunner(verbosity=2).run(suite)
