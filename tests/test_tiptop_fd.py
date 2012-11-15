@@ -19,24 +19,36 @@ class test_tiptop_fd (unittest.TestCase):
         self.assertIsNotNone(self.map1, "Found no entry for objects")            
     
     def test_comparequestionmark(self):
-        objectlist = sorted(self.map1.keys())        
+        objectlist = sorted(self.map1.keys())               
         for item in objectlist:
             i = 0
+            oldresult = [] 
+            newresult = []
             while i < len(self.map1[item]):
                 if self.map1[item][i] == '?':
                     self.assertNotEqual('?', self.map2[item][i], "Found ? for both tiptop")
-                    print "for %s, %s becomes %s" % (item, self.map1[item][i], self.map2[item][i])
+                    oldresult.append(self.map1[item][i])
+                    newresult.append(self.map2[item][i])
+                    #print "for %s, %s becomes %s" % (item, self.map1[item][i], self.map2[item][i])
                 i = i + 1
+            if oldresult != []:
+                print "for %s, %s becomes %s" % (item, ' '.join(oldresult), ' '.join(newresult))
     
     def test_comparedash(self):
         objectlist = sorted(self.map1.keys())        
         for item in objectlist:
             i = 0
+            oldresult = [] 
+            newresult = []
             while i < len(self.map1[item]):
                 if self.map1[item][i] == '-':
                     self.assertNotEqual('-', self.map2[item][i], "Found - for both tiptop")
-                    print "for %s, %s becomes %s" % (item, self.map1[item][i], self.map2[item][i])
+                    oldresult.append(self.map1[item][i])
+                    newresult.append(self.map2[item][i])
+                    #print "for %s, %s becomes %s" % (item, self.map1[item][i], self.map2[item][i])
                 i = i + 1
+            if oldresult != []:
+                print "for %s, %s becomes %s" % (item, ' '.join(oldresult), ' '.join(newresult))
         
     def test_findquestionmark(self):
         objectlist = sorted(self.map2.keys())        
