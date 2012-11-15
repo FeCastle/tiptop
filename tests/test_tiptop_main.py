@@ -8,6 +8,7 @@ from test_tiptop_fd import test_tiptop_fd
 import unittest
 import subprocess
 import cPickle as pickle
+import time
 
 def main():   
     processlist = []
@@ -45,14 +46,18 @@ def main():
         for cmd in processlist:
             subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
  
+    time.sleep(2)         #wait to finish
+     
     #use tiptop to evaluate info
     if argv[1] != 'passive':
-        for output in outputlist:
-            subprocess.Popen(base_oldcmd + output + ".old", stdout=subprocess.PIPE, shell=True)
-            subprocess.Popen(base_newcmd + output + ".new", stdout=subprocess.PIPE, shell=True)
+        #for output in outputlist:
+        subprocess.Popen(base_oldcmd + "tiptop.old", stdout=subprocess.PIPE, shell=True)
+        subprocess.Popen(base_newcmd + "tiptop.new", stdout=subprocess.PIPE, shell=True)
+    
+    time.sleep(n)         #wait to finish
                 
     #Examine old file
-    tiptop_output = open (output + ".old")  
+    tiptop_output = open ("tiptop.old")  
     for line in tiptop_output:
         for elem in objectlist:
             if elem in line:
@@ -60,7 +65,7 @@ def main():
     tiptop_output.close()
         
     #Examine new file
-    tiptop_output = open (output + ".new")  
+    tiptop_output = open ("tiptop.new")  
     for line in tiptop_output:
         for elem in objectlist:
             if elem in line:
