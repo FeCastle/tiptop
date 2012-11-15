@@ -1,2 +1,2 @@
 firefox
-chrome
+google-chrome
