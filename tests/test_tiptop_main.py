@@ -15,18 +15,19 @@ def main():
     objectlist = []
     objectoldmap = {}
     objectnewmap = {}
+    n = 2
     
-    old_tiptop = raw_input ("Enter relative path to old tiptop (eg ../src/tiptop): ")
-    new_tiptop = raw_input ("Enter relative path to new tiptop: ")
+    old_tiptop = raw_input ("Enter path to old tiptop (eg ../src/tiptop): ")
+    new_tiptop = raw_input ("Enter path to new tiptop: ")
     
     if old_tiptop == '':
         old_tiptop = "../../oldtiptop/tiptop/src/tiptop"
     if new_tiptop == '':
         new_tiptop = "../src/tiptop"
-    
+   
     #build tiptop command
-    base_oldcmd = old_tiptop + " -b -c -n 2 -o "
-    base_newcmd = new_tiptop + " -b -c -n 2 -o "    
+    base_oldcmd = old_tiptop + " -b -c -n " + n + " -o "
+    base_newcmd = new_tiptop + " -b -c -n " + n + " -o "    
     
     #read testobjects.txt and build list of commands
     try:
@@ -45,9 +46,10 @@ def main():
             subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
  
     #use tiptop to evaluate info
-    for output in outputlist:
-        subprocess.Popen(base_oldcmd + output + ".old", stdout=subprocess.PIPE, shell=True)
-        subprocess.Popen(base_newcmd + output + ".new", stdout=subprocess.PIPE, shell=True)
+    if argv[1] != 'passive':
+        for output in outputlist:
+            subprocess.Popen(base_oldcmd + output + ".old", stdout=subprocess.PIPE, shell=True)
+            subprocess.Popen(base_newcmd + output + ".new", stdout=subprocess.PIPE, shell=True)
                 
     #Examine old file
     tiptop_output = open (output + ".old")  
