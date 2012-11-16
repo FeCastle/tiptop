@@ -1,5 +1,5 @@
 """
-Usage: python test_tiptop_main.py [pass]
+Usage: python test_tiptop_main.py [pass|passive]
 pass - Used when user already configure commands run in background.
 passive - Used when user already ran tiptop and saved in tiptop.old and tiptop.new
 Need to put list of commands in testobjects.txt before running this script
