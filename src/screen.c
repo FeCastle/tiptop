@@ -61,7 +61,8 @@ static void check_counters_used(expression* e, screen_t* s, int* error)
     if (strcmp(e->ele->alias, "CPU_TOT") == 0 ||
         strcmp(e->ele->alias, "CPU_SYS") == 0 ||
         strcmp(e->ele->alias, "CPU_USER") == 0 ||
-        strcmp(e->ele->alias, "PROC_ID") == 0 )
+        strcmp(e->ele->alias, "PROC_ID") == 0 ||
+        strcmp(e->ele->alias, "NUM_THREADS") == 0 )
       return ;
 
     for(i=0; i < s->num_counters; i++) {
@@ -494,7 +495,7 @@ int add_column(screen_t* const s, char* header, char* format, char* desc,
 
 /* This is the default screen, it uses only target-independent
    counters defined in the Linux header file. */
-static screen_t* default_screen()
+static screen_t* default_screen(const struct option* options)
 {
   screen_t* s = new_screen("default", "Screen by default", 1);
 
@@ -509,6 +510,7 @@ static screen_t* default_screen()
   add_column(s, " %CPU", "%5.1f", "Total CPU usage", "CPU_TOT");
   add_column(s, " %SYS", "%5.1f", "System CPU usage", "CPU_SYS");
   add_column(s, "   P", "  %2.0f", "Processor where last seen", "PROC_ID");
+  if (!options->show_threads) add_column(s, " Threads", "  %6.0f", "Number of threads in process", "NUM_THREADS");
   add_column(s, "  Mcycle", "%8.2f", "Cycles (millions)",
              "delta(CYCLE) / 1e6");
   add_column(s, "  Minstr", "%8.2f", "Instructions (millions)",
@@ -551,10 +553,10 @@ static screen_t* branch_pred_screen()
 }
 
 
-void init_screen()
+void init_screen(const struct option* options)
 {
   branch_pred_screen();
-  default_screen();
+  default_screen(options);
 
   screens_hook();  /* target dependent screens, if any */
 }
