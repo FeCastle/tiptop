@@ -1,19 +1,19 @@
 \section{Methodology}
 \label{sec:methodology}
-In our development we started with tiptop version 2.1, which depends upon the libxml2~\cite{xxx} and ncurses~\cite{xxx} libraries.
-Tiptop is written in C~\cite{xxx} and all improvements and bugfixes were implemented in C, too.
-As a key feature enhancement, we integrated the PAPI~\cite{xxx} library into tiptop.
-In our testing we used Python~\cite{xxx} and C to automate the process of verifying bug fixes and feature enhancements.
+In our development we started with tiptop version 2.1, which depends upon the libxml2\footnote{\texttt{\url{http://www.xmlsoft.org/}}} and ncurses\footnote{\texttt{\url{http://www.gnu.org/software/ncurses/}}} libraries.
+Tiptop is written in C~\cite{Kernighan:1988:CPL:576122} and all improvements and bugfixes were implemented in C, too.
+As a key feature enhancement, we integrated the PAPI~\cite{Mucci99papi:a} library into tiptop.
+In our testing we used Python\footnote{\texttt{\url{http://www.python.org/}}} and C to automate the process of verifying bug fixes and feature enhancements.
 
-Fortunately, tiptop has an integral feature called \emph{batch mode}, which enables tiptop to output statistic to stdout, rather than the default real-time display.
+Fortunately, tiptop has an integral feature called \emph{batch mode}, which enables tiptop to output statistics to stdout, rather than the default real-time display.
 The batch mode feature greatly simplified the testing process and enabled us to easily extract process statistics from tiptop.
 
 Roughly, we can describe our methodology as a three-step process.
 \begin{enumerate}
 \item Identify feature or bug.
 \item Develop code to enhance or fix tiptop.
-\item Use Python (and sometimes C) to develop multiple unit tests that parse and verify the output of tiptop, and ensure that the feature works correctly or the bug is resolved.
+\item Use Python (and sometimes C) to develop multiple unit tests that parse and verify the output of tiptop, and ensure that the enhancements produces expected output, or the bug is resolved.
 \end{enumerate}
 
-In many cases we face the challenge of knowing what the ``correct" statistics are for an application. As an example, we are not aware of a trivial way to know the correct value for the number of threads for a Chrome process. Indeed, in many cases this is non-deterministic.
+In many cases we face the challenge of knowing what the ``correct" statistics are for an application. As an example, we are not aware of a trivial way to know the correct value for the number of threads for a Chrome process.
 In these cases we constructed applications with known values, such as a simple C program that spawns $N$ threads, and verified that tiptop reported the values correctly for our simple applications.
