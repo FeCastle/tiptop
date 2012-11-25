@@ -18,6 +18,7 @@
     <column header=" %CPU" format="%5.1f" desc="CPU usage" expr="CPU_TOT" />
     <column header=" %SYS" format="%5.1f" desc="system CPU usage" expr="CPU_SYS" />
     <column header="   P" format="  %2.0f" desc="Processor where last seen" expr="PROC_ID" />
+    <column header=" #TH" format="  %2.0f" desc="Number of threads in process" expr="NUM_THREADS" />
     <column header=" Mcycle" format="%7.1f" desc="Cycles (millions)" expr="delta(PAPI_TOT_CYC) / 1000000" />
     <column header=" Minstr" format="%7.1f" desc="Cycles (millions)" expr="delta(PAPI_TOT_INS) / 1000000" />
     <column header="    IPC" format="%7.2f" desc="Execute instructions per cycle" expr="delta(PAPI_TOT_INS) / delta(PAPI_TOT_CYC)" />
