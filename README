@@ -17,6 +17,7 @@ For installation instructions, check file INSTALL.
 * Requirements
 Linux 2.6.31+, /proc filesystem. For live-mode, the ncurses library is
 needed. libxml2 is required to parse the configuration file.
+PAPI 5.0.1 is required to use PAPI macros for hardware counters.
 
 
 * Common command lines:
