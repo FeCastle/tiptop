@@ -381,6 +381,9 @@ void new_processes(struct process_list* const list,
         retval = PAPI_set_multiplex(EventSet);
         if (retval != PAPI_OK) handle_error(retval);
 
+        for(zz = 0; zz < MAX_EVENTS; zz++)
+            ptr->papi[zz] = -1;
+        
         fail = 0;
         for(zz = 0; zz < ptr->num_events; zz++) {
           int fd;

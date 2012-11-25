@@ -225,7 +225,7 @@ static double get_counter_value(unit* e, counter_t* tab, int nbc, char delta,
     return p->num_threads;
 
   int EventCode = PAPI_NULL;
-  if (PAPI_event_name_to_code(e->alias,&EventCode) == PAPI_OK && p->tid == p->pid) {
+  if (PAPI_event_name_to_code(e->alias,&EventCode) == PAPI_OK) {
     double retval;
     
     int retcode;
@@ -248,9 +248,6 @@ static double get_counter_value(unit* e, counter_t* tab, int nbc, char delta,
     for (i=0;i<PAPI_num_events(options.attach.eventset);i++)
         values[i] = (long long)0;
 
-    retcode = PAPI_read( options.attach.eventset, values );
-    if (retcode!=PAPI_OK) handle_error(retcode);
-
     int k = 0;
     for (i=0;i<MAX_EVENTS;i++) {
         if (p->papi[i]==EventCode) {
@@ -258,6 +255,23 @@ static double get_counter_value(unit* e, counter_t* tab, int nbc, char delta,
             break;
         }
     }
+
+    int numPapiEvents = 0;
+    for (i=0;i<MAX_EVENTS;i++) {
+        if (p->papi[i]==-1) {
+            numPapiEvents = i;
+            break;
+        }
+    }    
+
+    if (k==(numPapiEvents-1)) {
+        retcode = PAPI_accum( options.attach.eventset, values );
+        if (retcode!=PAPI_OK) handle_error(retcode);
+    } else {
+        retcode = PAPI_read( options.attach.eventset, values );
+        if (retcode!=PAPI_OK) handle_error(retcode);
+    }
+    
     return (double)(values[k]);
   }
 
