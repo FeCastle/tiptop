@@ -30,6 +30,7 @@
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
+#include <papi.h>
 
 #include "conf.h"
 #include "debug.h"
@@ -842,6 +843,13 @@ int main(int argc, char* argv[])
   int screen_num = 0;
   int q;
 
+  int retval;
+  retval = PAPI_library_init(PAPI_VER_CURRENT);
+  if (retval != PAPI_VER_CURRENT) handle_error(retval);
+  
+  retval = PAPI_multiplex_init();
+  if (retval != PAPI_OK) handle_error(retval);
+  
   /* Check OS to make sure we can run. */
   check();
 

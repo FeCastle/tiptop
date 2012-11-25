@@ -20,6 +20,7 @@
 #include <unistd.h>
 #include <sys/time.h>
 #include <sys/resource.h>
+#include <papi.h>
 
 #include "error.h"
 #include "hash.h"
@@ -34,6 +35,11 @@ static int num_files_limit = 0;
 
 static int   clk_tck;
 
+/////// PAPI Errors
+void handle_error (int retval)
+{
+    printf("PAPI error %d: %s\n", retval, PAPI_strerror(retval));
+}
 
 /*
  * Build the (empty) list of processes/threads.
@@ -72,7 +78,7 @@ struct process_list* init_proc_list()
           r1.rlim_max = hard_files_limit;
           /* Must bump our soft limit to the maximum. */
           setrlimit( RLIMIT_NOFILE, &r1 );
-          printf("Setting RLIMIT_NOFILE to %d\n",hard_files_limit);
+          //printf("Setting RLIMIT_NOFILE to %d\n",hard_files_limit);
         }
         num_files_limit = hard_files_limit;
         break;
@@ -93,6 +99,10 @@ struct process_list* init_proc_list()
 static void done_proc(struct process* const p)
 {
   int val_idx;
+  if (p->papi_eventset!=-1) {
+      PAPI_cleanup_eventset(p->papi_eventset);
+      PAPI_destroy_eventset(&(p->papi_eventset));
+  }
   
   if (p->cmdline)
     free(p->cmdline);
@@ -359,27 +369,46 @@ void new_processes(struct process_list* const list,
 
         ptr->txt = malloc(TXT_LEN * sizeof(char));
 
+
+        int retval,EventSet = PAPI_NULL;
+
+        retval = PAPI_create_eventset(&EventSet);
+        if (retval != PAPI_OK) handle_error(retval);
+
+        retval = PAPI_assign_eventset_component(EventSet, 0);
+        if (retval != PAPI_OK) handle_error(retval);
+
+        retval = PAPI_set_multiplex(EventSet);
+        if (retval != PAPI_OK) handle_error(retval);
+
         fail = 0;
         for(zz = 0; zz < ptr->num_events; zz++) {
           int fd;
           events.type = screen->counters[zz].type;  /* eg PERF_TYPE_HARDWARE */
           events.config = screen->counters[zz].config;
 
-          if (num_files < num_files_limit) {
-            fd = sys_perf_counter_open(&events, tid, cpu, grp, flags);
-            if (fd == -1) {
-              error_printf("Could not attach counter '%s' to PID %d (%s): %s\n",
-                           screen->counters[zz].alias,
-                           tid,
-                           ptr->name,
-                           strerror(errno));
-            }
+            int EventCode = PAPI_NULL;
+            if (PAPI_event_name_to_code(screen->counters[zz].alias,&EventCode) == PAPI_OK) {
+                retval = PAPI_add_event(EventSet, EventCode);
+                if (retval != PAPI_OK) handle_error(retval);
+                ptr->papi[zz] = EventCode;
+            } else {
+                if (num_files < num_files_limit) {
+                    fd = sys_perf_counter_open(&events, tid, cpu, grp, flags);
+                    if (fd == -1) {
+                    error_printf("Could not attach counter '%s' to PID %d (%s): %s\n",
+                                screen->counters[zz].alias,
+                                tid,
+                                ptr->name,
+                                strerror(errno));
+                    }
+                } else {
+                    fd = -1;
+                    error_printf("Files limit reached for PID %d (%s)\n",
+                                tid, ptr->name);
+                }
           }
-          else {
-            fd = -1;
-            error_printf("Files limit reached for PID %d (%s)\n",
-                         tid, ptr->name);
-          }
+          
 
           if (fd == -1)
             fail++;
@@ -387,6 +416,20 @@ void new_processes(struct process_list* const list,
             num_files++;
           ptr->fd[zz] = fd;
           ptr->values[zz] = 0;
+        }
+
+        if (PAPI_num_events(EventSet)>0) {
+            ptr->papi_eventset = EventSet;
+            
+            retval = PAPI_attach(EventSet, tid);
+            if (retval != PAPI_OK) handle_error(retval);
+        
+            retval = PAPI_start(EventSet);
+            if (retval != PAPI_OK) handle_error(retval);
+        } else {
+            ptr->papi_eventset = -1;
+            PAPI_cleanup_eventset(EventSet);
+            PAPI_destroy_eventset(&EventSet);
         }
 
 #if 0

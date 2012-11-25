@@ -39,6 +39,7 @@ struct process {
   short    proc_id;       /* processor ID on which process was last seen */
   short    num_threads;   /* number of threads in brotherhood */
   int      num_events;
+  int      papi_eventset;
 
   double   cpu_percent;   /* %CPU as displayed by top */
   double   cpu_percent_s; /* %CPU system */
@@ -51,6 +52,7 @@ struct process {
   int       fd[MAX_EVENTS];           /* file handles */
   uint64_t  values[MAX_EVENTS];       /* values read from counters */
   uint64_t  prev_values[MAX_EVENTS];  /* previous iteration */
+  uint64_t  papi[MAX_EVENTS];
   char* txt;  /* text representation of the process (what is displayed) */
 
   union sorting_column u;

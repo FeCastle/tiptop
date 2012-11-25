@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <papi.h>
 
 #include "formula-parser.h"
 #include "process.h"
@@ -219,6 +220,46 @@ static double get_counter_value(unit* e, counter_t* tab, int nbc, char delta,
 
   if (strcmp(e->alias, "CPU_USER") == 0)
     return p->cpu_percent_u;
+
+  if (strcmp(e->alias, "NUM_THREADS") == 0)
+    return p->num_threads;
+
+  int EventCode = PAPI_NULL;
+  if (PAPI_event_name_to_code(e->alias,&EventCode) == PAPI_OK && p->tid == p->pid) {
+    double retval;
+    
+    int retcode;
+    PAPI_option_t options;
+
+    int i = 0;
+    do {
+        options.attach.eventset = i;
+        retcode = PAPI_get_opt(PAPI_ATTACH, &options);
+        if (retcode<0) {
+            handle_error(retcode);
+            *error=1;
+            return 1;
+        }
+        if (options.attach.tid == p->tid) break;
+        i++;
+    } while (1);
+
+    long long values[PAPI_num_events(options.attach.eventset)];
+    for (i=0;i<PAPI_num_events(options.attach.eventset);i++)
+        values[i] = (long long)0;
+
+    retcode = PAPI_read( options.attach.eventset, values );
+    if (retcode!=PAPI_OK) handle_error(retcode);
+
+    int k = 0;
+    for (i=0;i<MAX_EVENTS;i++) {
+        if (p->papi[i]==EventCode) {
+            k = i;
+            break;
+        }
+    }
+    return (double)(values[k]);
+  }
 
   if (strcmp(e->alias, "PROC_ID") == 0) {
     if (p->proc_id != -1) {
