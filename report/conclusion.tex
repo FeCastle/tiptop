@@ -1,0 +1,19 @@
+\section{Future Work}
+\label{sec:conclusion}
+Tiptop is a useful application, and our extensions further enhance its utility.
+However, there are two major issues that require further investigation.
+
+First, our solution to the ``Too many open file descriptors bug" is unfortunately not comprehensive. On systems that have more than 819 processes and a hard file descriptor limit of 4096, this will still be an issue.
+We do not believe that it is reasonable to require superuser permissions to solve this problem.
+%We see two possible solutions to this.
+Therefore, as one solution, it may be possible to develop a heuristic algorithm that only opens a file descriptor for processes of interest.
+As an example the algorithm can create a hardware counter (i.e., open a file descriptor) for any process that has used the CPU in the last $N$ seconds.
+Of course, this will require process monitoring that does not use hardware performance counters.
+However, we believe that the overhead of such a strategy is justified, in order to minimize the probability of this bug occurring.
+%Alternatively, we have not fully investigated the opportunities that PAPI may present in mitigating this problem.
+
+Second, we found that tiptop is not well-supported in virtualized environments.
+The man page breifly mentions this, but does not elaborate further.
+Our testing confirms that data is often omitted or not reported correctly in VM instances.
+We believe this requires further investigation to understand why this is the case.
+Certainly, for testing purposes, the ability to test tiptop without requiring physical hardware would greatly increase the ability to verify that features are correctly implemented across CPU architectures.

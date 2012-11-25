@@ -65,7 +65,7 @@ int add_column(screen_t* const s, char* header, char* format, char* desc,
 
 void tamp_counters(void);
 
-void init_screen(void);
+void init_screen(const struct option*);
 screen_t* get_screen(int);
 screen_t* get_screen_by_name(const char* name);
 

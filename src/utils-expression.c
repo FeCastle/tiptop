@@ -270,6 +270,10 @@ static double get_counter_value(unit* e, counter_t* tab, int nbc, char delta,
       return 1;
     }
   }
+
+  if (strcmp(e->alias, "NUM_THREADS") == 0)
+    return p->num_threads;
+
   id = get_counter_id(e->alias, tab, nbc);
 
   if ((id == -1) || (p->values[id] == 0xffffffff)) {

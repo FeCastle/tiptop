@@ -871,7 +871,7 @@ int main(int argc, char* argv[])
 
   /* Add default screens */
   if (options.default_screen == 1)
-    init_screen();
+    init_screen(&options);
 
   /* Remove unused but declared counters */
   tamp_counters();
