@@ -1,0 +1,28 @@
+<tiptop>
+  <options>
+    <option name="cpu_threshold" value="0.00001" />
+    <option name="delay" value="2.0" />
+    <option name="only_pid" value="0" />
+    <option name="batch" value="0" />
+  </options>
+
+  <screen name="default" desc="Screen by default (config file)">
+    <counter alias="PAPI_TOT_CYC" config="CPU_CYCLES" type="PAPI" />
+    <counter alias="PAPI_TOT_INS" config="CPU_CYCLES" type="PAPI" />
+    <counter alias="PAPI_BR_MSP" config="CPU_CYCLES" type="PAPI" />
+    <counter alias="PAPI_BR_CN" config="CPU_CYCLES" type="PAPI" />
+    <counter alias="PAPI_L1_TCM" config="CPU_CYCLES" type="PAPI" />
+    <counter alias="PAPI_L1_TCA" config="CPU_CYCLES" type="PAPI" />
+    <counter alias="BUS" config="BUS_CYCLES" type="HARDWARE" />
+
+    <column header=" %CPU" format="%5.1f" desc="CPU usage" expr="CPU_TOT" />
+    <column header=" %SYS" format="%5.1f" desc="system CPU usage" expr="CPU_SYS" />
+    <column header="   P" format="  %2.0f" desc="Processor where last seen" expr="PROC_ID" />
+    <column header=" Mcycle" format="%7.1f" desc="Cycles (millions)" expr="delta(PAPI_TOT_CYC) / 1000000" />
+    <column header=" Minstr" format="%7.1f" desc="Cycles (millions)" expr="delta(PAPI_TOT_INS) / 1000000" />
+    <column header="    IPC" format="%7.2f" desc="Execute instructions per cycle" expr="delta(PAPI_TOT_INS) / delta(PAPI_TOT_CYC)" />
+    <column header=" %MISS" format="%6.1f" desc="Cache misses per 100 instructions" expr="100 * delta(PAPI_L1_TCM) / delta(PAPI_L1_TCA)" />
+    <column header=" %BMIS" format="%6.1f" desc="Branch misprediction per 100 instructions" expr="100 * delta(PAPI_BR_MSP) / delta(PAPI_BR_CN)" />
+    <column header=" %BUS" format="%5.1f" desc="Bus cycles per executed instruction" expr="delta(BUS) / delta(PAPI_TOT_INS)" />
+  </screen>
+</tiptop>
