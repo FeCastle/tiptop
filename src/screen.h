@@ -16,11 +16,14 @@
 #include "formula-parser.h"
 #include "options.h"
 
+#define PERF_TYPE_PAPI 999
+
 typedef struct {
   uint32_t  type;
   uint64_t  config;  /* Constant defined in configuration */
   char* alias;
   int used;
+  int papi_idx;
 } counter_t;
 
 
