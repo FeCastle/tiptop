@@ -1,7 +1,7 @@
 \section{Future Work}
 \label{sec:conclusion}
 Tiptop is a useful application, and our extensions further enhance its utility.
-However, there are two major issues that require further investigation.
+However, aside from the unresolved bug, there are four major points that require further investigation.
 
 First, our solution to the ``Too many open file descriptors bug" is unfortunately not comprehensive. On systems that have more than 819 processes and a hard file descriptor limit of 4096, this will still be an issue.
 We do not believe that it is reasonable to require superuser permissions to solve this problem.
@@ -13,7 +13,13 @@ However, we believe that the overhead of such a strategy is justified, in order 
 %Alternatively, we have not fully investigated the opportunities that PAPI may present in mitigating this problem.
 
 Second, we found that tiptop is not well-supported in virtualized environments.
-The man page breifly mentions this, but does not elaborate further.
+The man page briefly mentions this, but does not elaborate further.
 Our testing confirms that data is often omitted or not reported correctly in VM instances.
 We believe this requires further investigation to understand why this is the case.
 Certainly, for testing purposes, the ability to test tiptop without requiring physical hardware would greatly increase the ability to verify that features are correctly implemented across CPU architectures.
+
+Third, further investigation is require to understand if tiptop needs superuser access.
+
+Finally, our integration with PAPI opens tiptop to a much wider range of architectures and kernel versions. The tiptop application would benefit from a more robust testing framework that is able to validate the correctness of performance counter.
+As an example, it may be possible to create low-level assembly programs that execute a deterministic number of instructions.
+Then, this testing framework should be deployed and executed on a wide variety of configurations, in order to test the extensibility of tiptop.

@@ -1,34 +1,40 @@
 \section{Introduction}
-Hardware performance counters are architecture-specific special-purpose registers integrated into modern CPUs, and can be used to profile applications.
-As an example, modern Intel processors support hardware counters that report CPU utilization, L1 cache misses, branch mispredictions and a host of other CPU-specific performance indicators.
+Hardware performance counters are architecture-specific special-purpose registers integrated into modern central processing units (CPUs) used for performance profiling.
+As an example, modern Intel processors support hardware counters that report events such as CPU utilization, L1 cache misses, branch mispredictions and a host of other CPU-specific performance indicators.
 This information is invaluable when profiling low-level software performance.
 What is more, compared to traditional software-based profiling, hardware performance counters incur negligible overhead because they are integrated into the hardware.
-However, this performance advantage comes at a price.
-Support for hardware counters is still in early stages, and requires linux kernels 2.6.31 or above.
-There is still work to be done to make hardware counters trivial to use.
-%Indeed, hardware performance counters are still nontrivial to use.
+However, support for hardware counters is still in early stages, and was not integrated into the Linux kernel until the 2.6.31 release.
+In addition, some architectures support hardware counters, but have a hard limit on the number of events, sometimes only two or four, that can be monitored at a time.
 
 Tiptop~\cite{rohou:hal-00639173} is an application developed by Erven Rohou\footnote{\texttt{erven.rohou@inria.fr}} and is an attempt towards an intuitive interface for accessing hardware performance counters in modern CPUs.
 The interface for tiptop is similar to the popular top\footnote{\texttt{\url{http://sourceforge.net/projects/unixtop/}}} utility. 
-In tiptop's default configuration, it provides real-time statistics about running applications and their hardware performance counter values.
-The values that appear on the real-time screen are configurable by the user and through use of an XML configuration file, multiple screens can be configured and flipped through in real-time.
+In tiptop's default configuration, it provides real-time per-process hardware counter statistics, such as the number of CPU instructions executed per-process.
+The values that appear on the real-time screen are configurable by the user.
+Through use of an XML file, multiple screens can be configured and flipped through.
 In Figure~\ref{fig:tiptop-default} we have a screenshot of tiptop's default screen, and highlight a few of its key features.
-The full breadth of hardware performance counters supported by tiptop are too many to list here, for a full list of features see the tiptop man page.
 
-Despite the ease of use of tiptop, and its expansive set of hardware counters it supports via XML configuration, we identified a number of limitations.
-In our initial investigation of tiptop we identified two bugs, we have confirmed these through personal communications with lead developer Erven Rohou.
-Both bugs prevent tiptop from displaying statistics for processes.
+Despite tiptop's advantages, we identified a number of limitations.
+As one example, the Pentium III supports 80 hardware counter events, but can track at most two in parallel~\cite{hpc-trusted}.
+However, the default tiptop screen assumes that the underlying architecture can track five hardware counters events.
+In addition, we found that building XML files was cumbersome and platform-specific.
+To compound this problem, tiptop exposes less than 20\% of the hardware performance counters available across platforms.
+In many cases, tracking a hardware counter not currently supported by tiptop requires modification and recompilation of tiptop's C source files.
+
+In light of these limitations, we identified two feature enhancements for tiptop.
+First, we enhanced tiptop to display the number of threads per-process as a default feature.
+Then, as a substantial feature enhancement, we integrated the cross-platform Performance Application Programming Interface (PAPI)~\cite{Mucci99papi:a} library into tiptop as an alternative API to access hardware counters. (This is backwards-compatible change, and use of the PAPI API is optional when creating an XML configuration file.)
+Integration with PAPI increases the breadth of platforms and kernel versions supported by tiptop.
+Now, tiptop can run with kernel versions prior to 2.6.31, via a PAPI-supplied kernel patch.
+In addition, through software multiplexing, PAPI enables the number of hardware counter events to exceed the hard limit imposed by the hardware.
+Finally, the integration with PAPI simplifies the process of creating cross-platform XML configuration files for tiptop hardware counters can be specified by using PAPI-specific macros, by abstracting architecture-specific configuration options from the user.
+
+In addition to feature enhancements, we identified two tiptop bugs, and confirmed them through personal communications with lead developer Erven Rohou.
+Both bugs prevent tiptop from correctly displaying hardware counter statistics under specific conditions.
 For the first bug, we identified a solution that minimizes the probability that the bug occurs, and will work with Erven Rohou to include our patch into the main branch of the tiptop source.
-The second bug remains unresolved, but can avoided by running tiptop as root, and we hope to identify a better solution for the final version of this project.
-
-In addition to fixing existing bugs, we identified two feature enhancements for tiptop.
-First, we now include the number of threads per-process as a column in the default tiptop screen, and also provided hooks to allow a user to specify the number of threads as a column in custom screens, via XML configuration.
-Then, as a substantial feature enhancement, we have integrated the cross-platform Performance Application Programming Interface (PAPI)~\cite{Mucci99papi:a} library into tiptop.
-%in order to simplify the process of developing XML files that work for tiptop across multiple platforms.
-Integration with the PAPI library increases the breadth of platforms and kernel versions supported by tiptop, and simplifies the process of specifying XML configuration files that define custom tiptop screens.
+The second bug remains unresolved, but can be avoided by running tiptop as root.
 
 In section~\ref{sec:methodology} we give an overview of our high-level development cycle and the tools we used to repair and enhance tiptop.
-In section~\ref{sec:results} we give further details about the bugfixes and feature enhancements we identified for this project.
+In section~\ref{sec:results} we give further details about our feature enhancements and bugfixes.
 We conclude in section~\ref{sec:conclusion} with a discussion about additional feature improvements for future versions of tiptop.
 
 \begin{figure}[t]
