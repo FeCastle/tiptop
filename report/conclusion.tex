@@ -19,7 +19,10 @@ We believe this requires further investigation to understand why this is the cas
 Certainly, for testing purposes, the ability to test tiptop without requiring physical hardware would greatly increase the ability to verify that features are correctly implemented across CPU architectures.
 
 Third, further investigation is require to understand if tiptop needs superuser access.
+The PAPI library requires superuser permission to operate properly, and current bugs in the mainline version of tiptop can be resolved by running tiptop as a super user, too.
+An understanding of these issues and a step towards a fully-featured non-superuser tiptop would be ideal.
 
-Finally, our integration with PAPI opens tiptop to a much wider range of architectures and kernel versions. The tiptop application would benefit from a more robust testing framework that is able to validate the correctness of performance counter.
-As an example, it may be possible to create low-level assembly programs that execute a deterministic number of instructions.
+Finally, our integration with PAPI opens tiptop to a much wider range of architectures and kernel versions. The tiptop application would benefit from a more robust testing framework that is able to automatically validate the correctness of performance counters.
+As an example, it may be possible to create a suite low-level assembly programs that execute a deterministic number of instructions.
 Then, this testing framework should be deployed and executed on a wide variety of configurations, in order to test the extensibility of tiptop.
+Unfortunately, building such a testing framework was beyond the scope of this project, but would be an ideal next step to validate the statistics reported by tiptop.

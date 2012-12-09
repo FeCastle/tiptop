@@ -5,7 +5,7 @@ In this section we start with an overview  of our feature enhancements. Then, we
 \subsection{Feature Enhancements}
 Roughly, we enhanced tiptop with two new features.
 First, we enhanced the default screen to include the number of threads per process.
-Then, we added into tiptop the the cross-platform Performance Application Programming Interface (PAPI)~\cite{Mucci99papi:a} library, this enables a new, and more robust way, for tiptop to access performance counters.
+Then, we added support for tiptop to use the cross-platform Performance Application Programming Interface (PAPI)~\cite{Mucci99papi:a} library, which enables a new, and more robust way, for tiptop to access performance counters.
 We will discuss each of these feature in turn.
 
 \subsubsection{Thread count on main screen}
@@ -31,13 +31,15 @@ In the testing of this feature we did the following, using Python and C.
 Our tests passed on Ubuntu 12.04 executing a simple C program that invokes threads through the pthreads library, for values $N\in\{1,10,100\}$.
 In Figure~\ref{fig:tiptop-threads} we have a screenshot of the enhanced default screen with the thread-count column, \texttt{\#TH}, highlighted.
 
+The implementation and testing of this feature was relatively straightforward, and was an excellent introduction to hardware counters and the structure of the tiptop source code.
+
 \begin{figure}[t]
 \footnotesize
 \centering
 \includegraphics[width=.7\textwidth]{tiptop-threads}
 %\hspace{.1in}
 %\includegraphics[width=0.48\textwidth]{tiptop-default-screenshot-1}
-\caption{A screenshot of the enhanced tiptop homescreen, showing the number of threads in each process.}
+\caption{\footnotesize A screenshot of the enhanced tiptop homescreen, showing the number of threads in each process.}
 \label{fig:tiptop-threads}
 \end{figure}
 
@@ -48,13 +50,13 @@ In Figure~\ref{fig:tiptop-threads} we have a screenshot of the enhanced default 
 \includegraphics[width=.7\textwidth]{tiptop-papi}
 %\hspace{.1in}
 %\includegraphics[width=0.48\textwidth]{tiptop-default-screenshot-1}
-\caption{The tiptop home screen implemented using the PAPI API. One side effect of using PAPI is that zero-values appear as \texttt{-} on the tiptop output. This was an inadvertent side-effect, but makes the screen more readable.}
+\caption{\footnotesize The tiptop home screen implemented using the PAPI API. One side effect of using PAPI is that zero-values appear as \texttt{-} on the tiptop output. This was an inadvertent side-effect, but makes the screen more readable.}
 \label{fig:tiptop-papi}
 \end{figure}
 
 As our next feature for tiptop, we integrated support for the Performance Application Programming Interface (PAPI) library.
 The PAPI library is a cross-platform API for accessing hardware performance counters.
-Roughly, it is a interface that removes the complexity involved in accessing hardware performance counters.
+Roughly, it is a interface that removes the complexity involved in accessing hardware performance counters across a range of architectures.
 
 Consider the following concrete example for why integration with PAPI enhances tiptop.
 The man page for tiptop gives the following example for a way to manually specify a counter that records the number of issued mico-ops on Sandy Bridge:
@@ -79,7 +81,7 @@ This is certainly a nightmare when developing a tiptop screen that may be used a
 Fortunately, PAPI makes life much easier.
 Instead of having to specify a hardware-specific counter macro, then reference the macro for display, our new feature enables a user to specify the PAPI event directly.
 There are 103 counter events specified in PAPI 5.0.1, and our integration with PAPI enables a user specify the PAPI-defined macro.
-As an example, the following declaration would be able to integrate directly into the tiptop XML file
+As an example, the following declaration would be able to integrate directly into the tiptop XML file to display the number of issued mico-ops on any architecture:
 \begin{verbatim}
   <column header=" U Ops"
           format="%5.1f"
@@ -91,7 +93,9 @@ Hence, the user does not have to specify a custom hardware-specific \texttt{coun
 In addition, this is backwards compatible with previous versions of tiptop configurations files, and the prefix \texttt{PAPI\_} for an \texttt{expr} attribute in a \texttt{column} tag, is a flag for tiptop to call PAPI, rather than using a direct kernel call for hardware counters.
 
 In addition to a cleaner interface for accessing hardware counters, PAPI implements multiplexing for hardware counters, which enables a user to specify more counters that are permitted by the hardware.
-As previously mentioned, if the underlying architecture is a Pentium III, tiptop is limited to two hardware counter events. However, PAPI implements multiplexing via high-precision timeslice sharing. This means that hardware counters are rotated, by default, every 100ms such that values can be obtained for all requested counters.
+As previously mentioned, if the underlying architecture is a Pentium III, tiptop is limited to two hardware counter events.
+Yet, the tiptop home screen requires that the underlying architecture supports five hardware counter events.
+However, PAPI implements multiplexing via high-precision timeslice sharing. This means that hardware counters are rotated, by default, every 100ms such that values can be obtained for all requested counters.
 If we, say, specify four hardware events to monitor, in a 200ms window PAPI would monitor two hardware events for the first 100ms, then rotate to monitor the other two hardware events for the remaining 100ms.
 
 Multiplexing does present limitations, if a user wanted to display a value such as instructions per second, this would require additional logic in order to know the amount of time that a specific counter was active.
@@ -100,7 +104,7 @@ We will leave this edge-case as future work.
 As an additional feature, integration with PAPI enables tiptop to support a broader range of kernels. Currently, tiptop supports Linux kernels 2.6.31 and above.
 PAPI supports Linux kernels 2.6.31 and above out of the box, and supports kernels 2.6.30 and below with a kernel patch.
 Tiptop is not compatible with the PAPI patch for pre-2.6.31 kernels, and would require further modification to work for pre-2.6.31 kernels.
-Hence, the PAPI integretation enables a greater range of kernel support without directly modifying tiptop.
+Hence, the PAPI integretation enables a greater range of kernel support without further changes to tiptop.
 
 \begin{figure}[t]
 \footnotesize
@@ -116,7 +120,7 @@ Instruction cache miss \% (\%MISS) & \texttt{100 * delta(MISS) / delta(INSN)} & 
 Branch misprediction \% (\%BMIS) & \texttt{100 * delta(BR) / delta(INSN)} & \texttt{100 * PAPI\_BR\_MSP / PAPI\_TOT\_INS} \\
 \bottomrule
 \end{tabular}
-\caption{The expression changes required in the tiptop XML configuration file in order to use PAPI, instead of the default direct call to the Linux kernel. The previous expression still work, and the new PAPI macros simply extend the range of hardware counters that can be accessed from tiptop.}
+\caption{\footnotesize The expression changes required in the tiptop XML configuration file in order to use PAPI, instead of the default direct call to the Linux kernel. The previous expression still work, and the new PAPI macros simply extend the range of hardware counters that can be accessed from tiptop.}
 \label{fig:tiptop-papi-expressions}
 \end{figure}
 
@@ -124,7 +128,7 @@ Branch misprediction \% (\%BMIS) & \texttt{100 * delta(BR) / delta(INSN)} & \tex
 When integrating PAPI with tiptop, we encountered a number of challenges.
 First, PAPI's documentation was nearly non-existent when describing its ability to multiplex and monitor external processes.
 A correct implementation required extensive reading and searching through the PAPI mailing lists.
-In addition, understanding tiptop's workflow and the correct functions to call to release the hardware counters via PAPI took some effort, too.
+In addition, understanding tiptop's workflow and the correct PAPI functions to call to release the hardware counters at the correct times took some effort, too.
 
 \paragraph{Case Study: Building the tiptop default home screen with PAPI.}
 In order to demonstrate the flexibility of our PAPI integration and its correctness, we implement the default tiptop screen using PAPI, instead of tiptop's default behavior of using direct kernel calls.
@@ -133,9 +137,10 @@ We first notice that the top of the screen the \texttt{[conf]} flag, which indic
 
 In Figure \ref{fig:tiptop-papi-expressions} we have a listing of the current tiptop expression used to build the default screen, and the alternative expression that can now be used to access counter via PAPI. These expressions can be mixed and matched within the same XML file.
 
-As an example of another benefit of PAPI exposed by building the home screen, the tiptop interface exposes \texttt{MISS} (Figure \ref{fig:tiptop-papi-expressions}) as \texttt{PERF\_COUNT\_HW\_CACHE\_MISSES}, which in the Linux kernel references either L1 or L2 Instruction Cache misses\footnote{\texttt{\url{https://lkml.org/lkml/2010/11/1/131}}}.
-Depending upon your kernel version, for \%MISS in Figure \ref{fig:tiptop-papi-expressions} with return either Level 1 or Level 2 instruction cache misses. However, it is clear from the PAPI macro that we are returning the Level 1 instruction cache miss. If we, say, wanted to report Level 2 instruction cache misses instead, we simply replace \texttt{PAPI\_L1\_ICM} with \texttt{PAPI\_L2\_ICM}.
+As an example of another benefit of PAPI exposed by building the home screen, the tiptop interface exposes \texttt{MISS} (Figure \ref{fig:tiptop-papi-expressions}, default expressions) as a direct call to the kernel macro \texttt{PERF\_COUNT\_HW\_CACHE\_MISSES}.
+Depending upon your kernel version, for \%MISS in Figure \ref{fig:tiptop-papi-expressions} with return either Level 1 or Level 2 instruction cache misses\footnote{\texttt{\url{https://lkml.org/lkml/2010/11/1/131}}}. However, it is clear from the PAPI macro that we are returning the Level 1 instruction cache miss. If we, say, wanted to report Level 2 instruction cache misses instead, we simply replace \texttt{PAPI\_L1\_ICM} with \texttt{PAPI\_L2\_ICM}.
 Alternatively, if we wanted, instead, the Level 3 data cache miss, we could use the macro \texttt{PAPI\_L3\_DCM}.
+The flexibility, clarity, and robustness of using PAPI macros are already clear in this simple example of recreating the tiptop homescreen.
 
 \subsection{Bug Fixes}
 In our initial attempt to understand tiptop and its range of features we encountered an anomaly.
@@ -149,7 +154,7 @@ Upon investigation, we identified two separate issues that lead to this error co
 \includegraphics[width=.9\textwidth]{tiptop-bug}
 %\hspace{.1in}
 %\includegraphics[width=0.48\textwidth]{tiptop-default-screenshot-1}
-\caption{A screenshot of the manifestation of the two bugs identified in our development. When tiptop is unable to determine the values associated with a process it ouputs a question mark instead. As we can see, tiptop failed to gather statistics for three of the four Chrome processes in the above screenshot, at the bottom of the screen, in the red box, tiptop reports that \texttt{[errors]} occurred.}
+\caption{\footnotesize A screenshot of the manifestation of the two bugs identified in our development. When tiptop is unable to determine the values associated with a process it ouputs a question mark instead. As we can see, tiptop failed to gather statistics for three of the four Chrome processes in the above screenshot, at the bottom of the screen, in the red box, tiptop reports that \texttt{[errors]} occurred.}
 \label{fig:tiptop-bug}
 \end{figure}
 
