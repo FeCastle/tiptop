@@ -48,9 +48,7 @@ Makefile: Makefile.in ../config.status
 
 
 version.o: version.c
-	$(CC) $(CFLAGS) -DCOMPILE_HOST="\""`hostname`"\"" \
-                        -DCOMPILE_DATE="\"`date`\"" \
-                        -c $(srcdir)/version.c
+	$(CC) $(CFLAGS) -c $(srcdir)/version.c
 
 
 lex.yy.c: calc.lex
