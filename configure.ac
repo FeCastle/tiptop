@@ -35,6 +35,14 @@ AC_CHECK_LIB([xml2], [xmlParseFile],
              [have_xml2=no])
 fi
 
+# Check for papi
+AC_CHECK_LIB([papi], [PAPI_library_init],
+                  [have_papi=yes;
+                  AC_DEFINE([HAVE_LIBPAPI], [1], [Define to 1 if you have the `libpapi' library (-lpapi).])
+                  LIBS="-lpapi $LIBS"],
+             [have_papi=no])
+
+
 # Checks for header files.
 AC_CHECK_HEADERS([inttypes.h stdint.h stdlib.h string.h sys/ioctl.h sys/time.h unistd.h])
 
