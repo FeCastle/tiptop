@@ -57,8 +57,9 @@ lex.yy.c: calc.lex
 lex.yy.o: lex.yy.c
 	$(CC) $(CFLAGS) -I$(srcdir) -c lex.yy.c
 
+y.tab.c: y.tab.h
 
-y.tab.c y.tab.h: calc.y
+y.tab.h: calc.y
 	$(YACC) -d $(srcdir)/calc.y
 
 y.tab.o: y.tab.c
