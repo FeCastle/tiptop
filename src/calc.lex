@@ -11,6 +11,7 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "formula-parser.h"
 #include "y.tab.h"
