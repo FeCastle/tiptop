@@ -24,6 +24,7 @@ AC_CHECK_LIB([curses], [initscr],
                   AC_DEFINE([HAVE_LIBCURSES], [1], [Define to 1 if you have the `curses' library (-lcurses).])
                   LIBS="-lcurses $LIBS"],
              [have_curses=no])
+AC_CHECK_LIB([tinfo], [keypad], LIBS="-ltinfo $LIBS")
 fi
 
 if test ! x$disable_libxml2 = xno; then # check only if not disabled

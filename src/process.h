@@ -95,4 +95,6 @@ void reset_values(const struct process_list* const);
 
 void update_name_cmdline(int pid, int name_only);
 
+void handle_error (int retval);
+
 #endif  /* _PROCESS_H */
